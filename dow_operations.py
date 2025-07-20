@@ -1,6 +1,31 @@
 
+#____________ Saving & Displaying Error Mechanism ______________________
+def show_exception_and_exit(exc_type, exc_value, tb):
+    import traceback
+    traceback.print_exception(exc_type, exc_value, tb)
+    input("Press key to exit.")
+    sys.exit(-1)
 
-def ascending(dow):
+import sys
+sys.excepthook = show_exception_and_exit
+
+
+# Assembly words have many properties and operations; all their functions are saved here.
+
+# IMPORTANT: This file gathers data from the "Data" folder, 
+# so they must be located in the same folder in order to work.
+
+import itertools
+import os
+
+# string holding the location of this file, used to find the required data files
+current_file_path = os.path.realpath(__file__)
+current_file_name = os.path.basename(__file__)
+for i in range(len(current_file_name)):
+    current_file_path=current_file_path[:-1]
+
+
+def ascending(dow): # given a dow, return the same word in acending order (first number is 1, then 2, etc)
 	size=int((len(dow)+1)/4)
 
 	substitution=[None]*size
@@ -21,7 +46,7 @@ def ascending(dow):
 
 
 
-def reverse(dow):
+def reverse(dow): # returns string reversed
 
 	reverse_dow=dow [::-1]	
 	ascending_reverse_dow=ascending(reverse_dow)
@@ -29,7 +54,7 @@ def reverse(dow):
 	return ascending_reverse_dow
 
 
-def isDOW(dow):
+def isDOW(dow): # checks if input is a double occurance word in ascending order, if so, returns True
 	
 	try:
 		dow_list=dow.split()
@@ -44,103 +69,32 @@ def isDOW(dow):
 					occurance+=1
 
 			if occurance!=2:
-				print('The DOW was not inputted in the correct format.')
+				# print('The DOW was not inputted in the correct format.')
 				return False
 
 		dow_word=" ".join(str(x) for x in dow_list)
-		print(dow_word)
 
 		if dow_word==dow:
 			return True
 		else:
-			print('The DOW was not inputted in the correct format.')
+			# print('The DOW was not inputted in the correct format.')
 			return False
 
 	except ValueError:
-		print('The DOW was not inputted in the correct format.')
+		# print('The DOW was not inputted in the correct format.')
 		return False
 	
 	
 
-def getSize(dow):
+def getSize(dow): # retunrs size of word (its highest integer element), based on dow string format
 	return int((len(dow)+1)/4)
 
 
-
-def isPalindromic(dow):
-
-	reverse_dow=reverse(dow)
-
-	if reverse_dow==dow:
-		return True
-	else: 
-		return False
-
-# print(isPalindromic('1 2 2 1')) # True
-# print(isPalindromic('1 1 2 2')) # True
-# print(isPalindromic('1 2 1 2 3 3')) # False 
-
-
-
-def isWeaklyIrreducible(dow):
-
-	n=getSize(dow)
-
-	for i in range(n-1):
-
-		file_name="Data/assembly_words_"+str(i+1)
-
-		try:
-			f=open(file_name, 'r')
-
-			with f:
-				for line in f:
-					if line.strip()==dow[:(4*i+3)]:
-
-						return False
-
-		except OSError:
-			print ("Could not open/read file:", file_name)
-
-	return True	
-
-# print(isWeaklyIrreducible('1 2 2 1')) # True
-# print(isWeaklyIrreducible('1 1 2 2')) # False
-# print(isWeaklyIrreducible('1 2 1 2')) # True
-# print(isWeaklyIrreducible('1 2 3 1 2 3 4 4')) # False 
-
-
-
-# def isStrictlyIrreducible(dow): #checks if s.i. given that it is w.i. already (doen't check subwords starting with 1)
-
-# 	n=getSize(dow)
-# 	my_list=[]
-
-# 	def inBetween(number_list):
-
-# 		for i in number_list:
-# 			counter=dow.find(str(i))+2
-
-# 			while dow[counter]!=number_list[i] and counter<len(dow):
-# 				if not (dow[counter] in number_list):
-# 					my_list=my_list.append(dow[counter])
-# 				counter+=2
-
-# 	for i in range(n):
-# 		if i in
-
-# 	my_list=my_list.append(inBetween(my_list))
-
-# 	for i in range(n):
-
-
-def getAssemblyNumber(dow):
-
-
+def getAssemblyNumber(dow): #searches An_2 and An_3 files, returns a word's assembly number
 
 	for i in range(2,4):
 
-		file_name="Data/An"+str(i)
+		file_name=current_file_path+"Data/An"+str(i)
 
 
 		try:
@@ -154,13 +108,57 @@ def getAssemblyNumber(dow):
 
 		except OSError:
 			print ("Could not open/read file:", file_name)
+			print ("Make sure that the desired file have been generated and that they are stored in the same directory as the DOW.py, dow_operations.py and main.py scripts.")
+
 
 	return 1
 
 
-# print(getAssemblyNumber('1 2 2 1')) # 1
-# print(getAssemblyNumber('1 2 3 1 2 3 4 4')) # 1 
-# print(getAssemblyNumber('1 1 2 3 3 2 4 4')) # 2
-# print(getAssemblyNumber('1 1 2 3 3 2 4 4 5 6 6 5 7 7')) # 3
+def isPalindromic(dow): #returns True if a word is equivalent un to isomorphism (in ascending order) to its reverse 
 
+	reverse_dow=reverse(dow)
+
+	if reverse_dow==dow:
+		return True
+	else: 
+		return False
+
+
+
+def isWeaklyIrreducible(dow): #returns True if the word cannot be split into two assembly words
+
+	n=getSize(dow)
+	
+	for i in range(n-1):
+		if isDOW(dow[:(4*i+3)]) == True:
+			return False
+						
+	return True	
+
+
+
+def isStrictlyIrreducible(dow): #returns True if the word does not contain a smaller size assembly word as a sub string
+	
+	#checks if s.i. given that it is w.i. already (a.k.a doesn't check subwords starting with 1)
+
+	n=getSize(dow)
+	dow_list=dow.split()
+	
+	if n==1:
+		return True
+
+	for j in range(2,n+1):
+		number_list=[str(j)]
+		for i in number_list:
+			counter=dow_list.index(i)+1
+
+			while dow_list[counter]!=i and counter<len(dow_list):				
+				if not (dow_list[counter] in number_list):
+					number_list.append(dow_list[counter])
+				counter+=1
+
+		if len(number_list)!=n:
+			return False
+	
+	return True
 

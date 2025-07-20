@@ -1,3 +1,5 @@
+
+#____________ Saving & Displaying Error Mechanism ______________________
 def show_exception_and_exit(exc_type, exc_value, tb):
     import traceback
     traceback.print_exception(exc_type, exc_value, tb)
@@ -8,10 +10,16 @@ import sys
 sys.excepthook = show_exception_and_exit
 
 
+# This is the main script; 
+# it displays the interface for the database and makes searches based on the user's desired properties.
+
+# IMPORTANT: This file gathers data from the "Data" folder and imports functions from DOW.py, 
+# so they must be located in the same folder in order to work.
 
 import tkinter as tk
 from tkinter import ttk
 from tkinter import font
+from DOW import getWordsFromProp
 
 
 
@@ -67,7 +75,7 @@ tk.Frame(sub_frame, bg='#F0F0F0', height=30, width=550).grid()
 f=tk.Frame(sub_frame, bg='#F0F0F0')
 f.grid(sticky=tk.W)
 
-ttk.Label(f, text= 'Filter Properties: ', font='helvetica 12')grid(column=0, row=0)
+ttk.Label(f, text= 'Filter Properties: ', font='helvetica 12').grid(column=0, row=0)
 ttk.Label(f, text= 'chose the desired properties below',font='helvetica 12').grid(column=1, row=0)
 
 tk.Frame(sub_frame, bg='#F0F0F0', height=10, width=550).grid()
@@ -150,19 +158,38 @@ sumbit.grid(sticky=tk.E)
 
 
 def handle_search(): 
-    size=size_chosen.get()
-    an=an_chosen.get()
-    
+    #when 'search' button is clicked, retrieves list of words satisfying desired properties
+    word_list=getWordsFromProp(
+        size_chosen.get(), 
+        an_chosen.get(), 
+        pal.get(), 
+        w_i.get(), 
+        s_i.get())
+
+    results.delete(0,'end') # result list is emptied
+
+    for word in word_list:  # result list is filled with all words satisfying the requirements
+        results.insert(tk.END, word)
+
+    num_text='the search found ' + str(len(word_list)) + ' words with the requested properties (of size < 8).'
+    result_label.configure(text=num_text) # the number of words satisfying the requirements is also displayed
+
 
 def handle_clear(): 
+    #when 'clear' button is clicked, all properties are set to default state and list is emptied
     size_chosen.current(newindex=0)
     an_chosen.current(newindex=0)
     pal_chosen.invoke()
     w_i_chosen.invoke()
     s_i_chosen.invoke()
-    
+
+    results.delete(0,'end')
+    result_label.configure(text='')
+
+
 
 def handle_quit(): 
+    #when 'quit' button is clicked, the application stops running
     main.destroy()
 
 tk.Button(
@@ -183,6 +210,27 @@ tk.Button(
     font='helvetica 10',
     width=10,
     command=handle_quit).grid(column=2, row=0, sticky=tk.W, padx=3, pady=3)
+
+
+
+#______ Result List _______
+
+tk.Frame(sub_frame, bg='#F0F0F0', height=30, width=550).grid()
+
+
+result_frame=tk.Frame(sub_frame, bg='#F0F0F0')
+result_frame.grid(sticky=tk.W)
+
+
+ttk.Label(result_frame, text= '  Results:', font='helvetica 12').grid( column=0, row=0)
+result_label=ttk.Label(result_frame, text= '', font='helvetica 10')
+result_label.grid(column=1, row=0)
+
+
+tk.Frame(sub_frame, bg='#F0F0F0', height=15, width=550).grid()
+
+results = tk.Listbox(sub_frame, width=75, height=15) #Listbox holding all the retrieved words
+results.grid()
 
 
 
