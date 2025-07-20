@@ -1,6 +1,6 @@
 # READ ME: Assembly Word Database
 
-This package contains data generators and a database interface to filter the properties of assembly words; a type of mathematcial object used to study the process of DNA sequence rearrangement. See [here](https://www.google.com) for information on its mathematical definition, properties and use in mathematical biology.
+This package contains data generators and a database interface to filter the properties of assembly words; a type of mathematcial object used to study the process of DNA sequence rearrangement. See [here](https://claudiaspythonlab.wordpress.com/2025/07/20/final-project-assembly-word-database/) for information on its mathematical definition, properties and use in mathematical biology.
 
 For now, it holds information on the properties of all assembly words of size at most 7. 
 
